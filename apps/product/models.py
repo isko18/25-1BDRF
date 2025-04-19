@@ -35,6 +35,10 @@ class Product(models.Model):
     def __str__(self):
         return self.title
     
+    def get_first_image(self) -> 'ProductImage':
+        product_image = ProductImage.objects.filter(product=self).first()
+        return product_image.image.url if product_image else None
+    
     class Meta:
         verbose_name = "Товар"
         verbose_name_plural = "Товары"
@@ -44,7 +48,7 @@ class ProductImage(models.Model):
         to="Product",
         on_delete=models.CASCADE,
         verbose_name="Изображение",
-        related_name="product"
+        related_name="product_image"
     )
     image = ProcessedImageField(
         upload_to=get_product_upload_path,
