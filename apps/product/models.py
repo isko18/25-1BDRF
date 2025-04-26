@@ -2,6 +2,8 @@ from django.db import models
 from imagekit.models import ProcessedImageField
 from imagekit.processors import ResizeToFill
 from apps.utils import get_product_upload_path
+from slugify import slugify
+import uuid
 
 
 # Create your models here.
@@ -35,9 +37,20 @@ class Product(models.Model):
     def __str__(self):
         return self.title
     
+    
     def get_first_image(self) -> 'ProductImage':
         product_image = ProductImage.objects.filter(product=self).first()
         return product_image.image.url if product_image else None
+    
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            base_slug=slugify(self.title)
+            self.slug = base_slug
+            while Product.objects.filter(slug=self.slug).exists():
+                unique_suffix = uuid.uuid4().hex[:6]
+                self.slug = f"{base_slug}-{unique_suffix}"
+            
+        super().save(*args, **kwargs)
     
     class Meta:
         verbose_name = "Товар"
@@ -70,4 +83,5 @@ class ProductImage(models.Model):
         verbose_name = "Изображение"
         verbose_name_plural = "Изображения"
         ordering = ['position',]
+        
         
