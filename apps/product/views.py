@@ -8,6 +8,8 @@ from apps.product.utils import ProductPagination
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
 
+from rest_framework.permissions import IsAuthenticated
+
 class ProductMixins(GenericViewSet,
                     mixins.CreateModelMixin,
                     mixins.ListModelMixin,
@@ -20,6 +22,7 @@ class ProductMixins(GenericViewSet,
     lookup_field = ("slug")
     pagination_class = ProductPagination
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    permission_classes = [IsAuthenticated,]
     
     search_fields = ['title', 'description']
     ordering_fields = ['price', 'created_at']
